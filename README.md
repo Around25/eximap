@@ -57,6 +57,31 @@ mix deps.get
 mix test
 ```
 
+## Usage
+
+First configure the connection to your IMAP server:
+
+```yaml
+config :eximap,
+  account: "admin@localhost.dev",
+  password: "secret",
+  use_ssl: true,
+  incoming_mail_server: "localhost.dev",
+  incoming_port: 993, #TLS
+```
+
+Then start the connection to the server by calling the start_link method and execute commands.
+
+```bash
+iex> {:ok, pid} = Eximap.Imap.Client.start_link()
+iex> req = Eximap.Imap.Request.noop()
+iex> Eximap.Imap.Client.execute(pid, req) |> Map.from_struct()
+%{body: [%{}], error: nil,
+         message: "NOOP completed (0.000 + 0.000 secs).", partial: false,
+         request: %Eximap.Imap.Request{command: "NOOP", params: [],
+          tag: "EX1"}, status: "OK"}
+```
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed

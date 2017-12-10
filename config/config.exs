@@ -24,14 +24,14 @@ use Mix.Config
 config :eximap,
   account: "admin@localhost.dev",
   password: "secret",
+  use_ssl: true,
   incoming_mail_server: "localhost.dev",
-#  incoming_port: 143,
   incoming_port: 993, #TLS
+#  incoming_port: 143,
 
   # unused for IMAP
   outgoing_mail_server: "localhost.dev",
-  outgoing_port: 465,
-  use_ssl: true
+  outgoing_port: 465
 
 
 
