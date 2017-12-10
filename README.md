@@ -15,9 +15,9 @@ Completed:
 - open an TLS connection to an IMAP server
 - login using an email account and password (PLAIN AUTH over TLS)
 - Execute commands and return the result as an Elixir structure
+- Format each response as either a map or a structure for easier interaction.
 
 Under development:
-- Format each response as either a map or a structure for easier interaction.
 - Handle binary responses
 
 Planned:
