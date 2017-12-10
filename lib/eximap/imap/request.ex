@@ -13,10 +13,10 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.noop()
     iex> Eximap.Imap.Client.execute(pid, req) |> Map.from_struct()
-    %{body: ["EX1 OK NOOP completed (0.000 + 0.000 secs)."], error: nil,
-    message: "NOOP completed (0.000 + 0.000 secs).", partial: false,
-    request: %Eximap.Imap.Request{command: "NOOP", params: [], tag: "EX1"},
-    status: "OK"}
+    %{body: [%{}], error: nil,
+             message: "NOOP completed (0.000 + 0.000 secs).", partial: false,
+             request: %Eximap.Imap.Request{command: "NOOP", params: [],
+              tag: "EX1"}, status: "OK"}
 
   """
   def noop(), do: %Eximap.Imap.Request{command: "NOOP"}
@@ -31,12 +31,13 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.capability()
     iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: ["EX1 OK Capability completed (0.000 + 0.000 secs).",
-    "* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SPECIAL-USE QUOTA"],
-    error: nil, message: "Capability completed (0.000 + 0.000 secs).",
-    partial: false,
-    request: %Eximap.Imap.Request{command: "CAPABILITY", params: [],
-    tag: "EX1"}, status: "OK"}
+    %Eximap.Imap.Response{body: [%{},
+             %{message: "IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SPECIAL-USE QUOTA",
+               type: "CAPABILITY"}], error: nil,
+            message: "Capability completed (0.000 + 0.000 secs).",
+            partial: false,
+            request: %Eximap.Imap.Request{command: "CAPABILITY", params: [],
+             tag: "EX1"}, status: "OK"}
 
   """
   def capability(), do: %Eximap.Imap.Request{command: "CAPABILITY"}
@@ -58,15 +59,17 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.list()
     iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: ["EX1 OK List completed (0.000 + 0.000 secs).",
-     "* LIST (\\HasNoChildren) \".\" INBOX",
-     "* LIST (\\HasNoChildren \\Sent) \".\" Sent",
-     "* LIST (\\HasNoChildren \\Trash) \".\" Trash",
-     "* LIST (\\HasNoChildren \\Drafts) \".\" Drafts",
-     "* LIST (\\HasNoChildren \\Junk) \".\" Junk"], error: nil,
-    message: "List completed (0.000 + 0.000 secs).", partial: false,
-    request: %Eximap.Imap.Request{command: "LIST",
-     params: ["\"\"", "\"%\""], tag: "EX1"}, status: "OK"}
+    %Eximap.Imap.Response{body: [%{},
+             %{message: "(\\HasNoChildren) \".\" INBOX", type: "LIST"},
+             %{message: "(\\HasNoChildren \\Sent) \".\" Sent", type: "LIST"},
+             %{message: "(\\HasNoChildren \\Trash) \".\" Trash", type: "LIST"},
+             %{message: "(\\HasNoChildren \\Drafts) \".\" Drafts",
+               type: "LIST"},
+             %{message: "(\\HasNoChildren \\Junk) \".\" Junk", type: "LIST"}],
+            error: nil, message: "List completed (0.000 + 0.000 secs).",
+            partial: false,
+            request: %Eximap.Imap.Request{command: "LIST",
+             params: ["\"\"", "\"%\""], tag: "EX1"}, status: "OK"}
   """
   def list(reference\\"\"\"", mailbox \\ "\"%\""), do: %Eximap.Imap.Request{command: "LIST", params: [reference, mailbox]}
   def lsub(reference\\"\"\"", mailbox \\ "\"\""), do: %Eximap.Imap.Request{command: "LSUB", params: [reference, mailbox]}
@@ -80,11 +83,11 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.logout()
     iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: ["EX1 OK Logout completed (0.000 + 0.000 secs).",
-             "* BYE Logging out"], error: nil,
-            message: "Logout completed (0.000 + 0.000 secs).", partial: false,
-            request: %Eximap.Imap.Request{command: "LOGOUT", params: [],
-             tag: "EX1"}, status: "OK"}
+    %Eximap.Imap.Response{body: [%{},
+       %{message: "Logging out", type: "BYE"}], error: nil,
+      message: "Logout completed (0.000 + 0.000 secs).", partial: false,
+      request: %Eximap.Imap.Request{command: "LOGOUT", params: [],
+       tag: "EX1"}, status: "OK"}
   """
   def logout(), do: %Eximap.Imap.Request{command: "LOGOUT"}
 
@@ -93,18 +96,19 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.select("INBOX")
     iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: ["EX1 OK [READ-WRITE] Select completed (0.000 + 0.000 secs).",
-     "* OK [HIGHESTMODSEQ 1] Highest",
-     "* OK [UIDNEXT 1] Predicted next UID",
-     "* OK [UIDVALIDITY 1512767411] UIDs valid", "* 0 RECENT",
-     "* 0 EXISTS",
-     "* OK [PERMANENTFLAGS (\\Answered \\Flagged \\Deleted \\Seen \\Draft \\*)] Flags permitted.",
-     "* FLAGS (\\Answered \\Flagged \\Deleted \\Seen \\Draft)"],
-    error: nil,
-    message: "[READ-WRITE] Select completed (0.000 + 0.000 secs).",
-    partial: false,
-    request: %Eximap.Imap.Request{command: "SELECT", params: ["INBOX"],
-     tag: "EX1"}, status: "OK"}
+    %Eximap.Imap.Response{body: [%{},
+             %{message: "[HIGHESTMODSEQ 1] Highest", type: "OK"},
+             %{message: "[UIDNEXT 1] Predicted next UID", type: "OK"},
+             %{message: "[UIDVALIDITY 1512767411] UIDs valid", type: "OK"},
+             %{message: "RECENT", type: "0"}, %{message: "EXISTS", type: "0"},
+             %{message: "[PERMANENTFLAGS (\\Answered \\Flagged \\Deleted \\Seen \\Draft \\*)] Flags permitted.",
+               type: "OK"},
+             %{message: "(\\Answered \\Flagged \\Deleted \\Seen \\Draft)",
+               type: "FLAGS"}], error: nil,
+            message: "[READ-WRITE] Select completed (0.000 + 0.000 secs).",
+            partial: false,
+            request: %Eximap.Imap.Request{command: "SELECT", params: ["INBOX"],
+             tag: "EX1"}, status: "OK"}
   """
   def select(name), do: %Eximap.Imap.Request{command: "SELECT", params: [name]}
   def subscribe(name), do: %Eximap.Imap.Request{command: "SUBSCRIBE", params: [name]}
@@ -115,17 +119,18 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.examine("INBOX")
     iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: ["EX1 OK [READ-ONLY] Examine completed (0.000 + 0.000 secs).",
-     "* OK [HIGHESTMODSEQ 1] Highest",
-     "* OK [UIDNEXT 1] Predicted next UID",
-     "* OK [UIDVALIDITY 1512767411] UIDs valid", "* 0 RECENT",
-     "* 0 EXISTS", "* OK [PERMANENTFLAGS ()] Read-only mailbox.",
-     "* FLAGS (\\Answered \\Flagged \\Deleted \\Seen \\Draft)"],
-    error: nil,
-    message: "[READ-ONLY] Examine completed (0.000 + 0.000 secs).",
-    partial: false,
-    request: %Eximap.Imap.Request{command: "EXAMINE", params: ["INBOX"],
-    tag: "EX1"}, status: "OK"}
+    %Eximap.Imap.Response{body: [%{},
+             %{message: "[HIGHESTMODSEQ 1] Highest", type: "OK"},
+             %{message: "[UIDNEXT 1] Predicted next UID", type: "OK"},
+             %{message: "[UIDVALIDITY 1512767411] UIDs valid", type: "OK"},
+             %{message: "RECENT", type: "0"}, %{message: "EXISTS", type: "0"},
+             %{message: "[PERMANENTFLAGS ()] Read-only mailbox.", type: "OK"},
+             %{message: "(\\Answered \\Flagged \\Deleted \\Seen \\Draft)",
+               type: "FLAGS"}], error: nil,
+            message: "[READ-ONLY] Examine completed (0.000 + 0.000 secs).",
+            partial: false,
+            request: %Eximap.Imap.Request{command: "EXAMINE", params: ["INBOX"],
+             tag: "EX1"}, status: "OK"}
   """
   def examine(name), do: %Eximap.Imap.Request{command: "EXAMINE", params: [name]}
   def create(name), do: %Eximap.Imap.Request{command: "CREATE", params: [name]}
@@ -134,6 +139,17 @@ defmodule Eximap.Imap.Request do
   def append(name, [] = opts), do: %Eximap.Imap.Request{command: "APPEND", params: [name, Enum.join(opts, "")]}
   def rename(name, new_name), do: %Eximap.Imap.Request{command: "RENAME", params: [name, new_name]}
 
+  @doc ~S"""
+
+    iex> {:ok, pid} = Eximap.Imap.Client.start_link()
+    iex> Eximap.Imap.Client.execute(pid, Eximap.Imap.Request.select("INBOX"))
+    iex> req = Eximap.Imap.Request.check()
+    iex> Eximap.Imap.Client.execute(pid, req)
+    %Eximap.Imap.Response{body: [%{}], error: nil,
+            message: "Check completed (0.001 + 0.000 secs).", partial: false,
+            request: %Eximap.Imap.Request{command: "CHECK", params: [],
+             tag: "EX2"}, status: "OK"}
+  """
   def check(), do: %Eximap.Imap.Request{command: "CHECK", params: []}
   def starttls(), do: %Eximap.Imap.Request{command: "STARTTLS", params: []}
   def close(), do: %Eximap.Imap.Request{command: "CLOSE", params: []}

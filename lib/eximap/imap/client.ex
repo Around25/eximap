@@ -6,12 +6,6 @@ defmodule Eximap.Imap.Client do
 
   @moduledoc """
   Imap Client GenServer
-
-  TODOs:
-  - Generate unique tag for each request: "A000001 COMMAND BODY \r\n"
-
-  #  iex> Eximap.Imap.Client.command(pid, "A0001 LOGIN cosmin@localhost.dev secret")
-
   """
 
   @initial_state %{socket: nil, tag_number: 1}
@@ -77,7 +71,6 @@ defmodule Eximap.Imap.Client do
 
   defp parse_message(resp, ""), do: resp
   defp parse_message(resp, message) do
-    tag = resp.request.tag
     [head | [tail]] = String.split(message, "\r\n", parts: 2)
     {:ok, resp, tail} = Response.parse(resp, head, tail)
     if (resp.partial) do
