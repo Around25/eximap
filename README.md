@@ -1,6 +1,13 @@
 # Eximap
 
-**TODO: Add description**
+Eximap is an elixir library that can connect to IMAP servers via TLS and execute commands.
+
+## Motivation
+
+We started working with Elixir this year and we wanted to make an internal CRM, but we could not find any library
+that can connect to an IMAP server and load messages and that can be notified of new messages from the server.
+All options were in other languages like nodejs, but we since there is a POP3 library in erlang there should be one
+for IMAP as well.
 
 ## Installation
 

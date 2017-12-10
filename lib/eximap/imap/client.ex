@@ -2,6 +2,7 @@ defmodule Eximap.Imap.Client do
   use GenServer
   alias Eximap.Imap.Request
   alias Eximap.Imap.Response
+  alias Eximap.Socket
 
   @moduledoc """
   Imap Client GenServer
@@ -9,16 +10,11 @@ defmodule Eximap.Imap.Client do
   TODOs:
   - Generate unique tag for each request: "A000001 COMMAND BODY \r\n"
 
-  iex> {:ok, pid} = Eximap.Imap.Client.start_link()
-  iex> req = Eximap.Imap.Request.noop()
-  iex> Eximap.Imap.Client.execute(pid, req)
-  "EX2 OK NOOP completed.\\r\\n"
-
   #  iex> Eximap.Imap.Client.command(pid, "A0001 LOGIN cosmin@localhost.dev secret")
 
   """
 
-  @initial_state %{socket: nil, tag_prefix: "EX", tag_number: 1, queue: :queue.new()}
+  @initial_state %{socket: nil, tag_number: 1}
 
   def start_link do
     GenServer.start_link(__MODULE__, @initial_state)
@@ -30,48 +26,30 @@ defmodule Eximap.Imap.Client do
     port = Application.get_env(:eximap, :incoming_port)
     account = Application.get_env(:eximap, :account)
     pass = Application.get_env(:eximap, :password)
-    :ssl.start()
-    {:ok, socket} = :ssl.connect(host, port, opts)
+
+    # todo: Hardcoded SSL connection until I implement the Authentication algorithms to allow login over :gen_tcp
+    {:ok, socket} = Socket.connect(true, host, port, opts)
     state = %{state | socket: socket}
 
     # todo: parse the server attributes and store them in the state
     imap_receive_raw(socket)
 
-    state = %{state | socket: socket}
-
-    imap_send(%Request{command: "LOGIN", params: [account, pass]}, state)
-    imap_receive_raw(socket)
-    :ssl.setopts(socket, active: :once)
-    {:ok, %{state | tag_number: state.tag_number + 1}}
+    # login using the account name and password
+    req = Request.login(account, pass) |> Request.add_tag("EX_LGN")
+    imap_send(socket, req)
+    {:ok, %{state | socket: socket}}
   end
 
   def execute(pid, req) do
     GenServer.call(pid, {:command, req})
   end
 
-  def handle_call({:command, req}, from, %{socket: socket, tag_number: tag_number, queue: q} = state) do
-    imap_send(req, state)
-    {:noreply, %{state | tag_number: tag_number + 1, queue: :queue.in(from, q)}}
+  def handle_call({:command, %Request{} = req}, _from, %{socket: socket, tag_number: tag_number} = state) do
+    resp = imap_send(socket, %Request{req | tag: "EX#{tag_number}"})
+    {:reply, resp, %{state | tag_number: tag_number + 1}}
   end
 
-  @doc """
-
-  """
-  def handle_info({:ssl, socket, msg}, %{socket: socket} = state) do
-    # get the first element of the queue and return the new queue
-    {{:value, client}, new_queue} = :queue.out(state.queue)
-
-    # get only one message from the imap server
-#    :inet.setopts(socket, active: :once)
-    :ssl.setopts(socket, active: :once)
-
-    # reply to the calling process
-    GenServer.reply(client, msg)
-
-    # return the new state
-    {:noreply, %{state | queue: new_queue}}
-  end
-  def handle_info(resp, %{socket: socket} = state) do
+  def handle_info(resp, state) do
     IO.inspect resp
     {:noreply, state}
   end
@@ -80,27 +58,41 @@ defmodule Eximap.Imap.Client do
   # Private methods
   #
 
-  defp imap_send(req, %{socket: socket} = state) do
-    message = encode(state, req.command, req.params)
+  defp imap_send(socket, req) do
+    message = Request.raw(req)
     imap_send_raw(socket, message)
+    imap_receive(socket, req)
   end
 
   defp imap_send_raw(socket, msg) do
-    IO.inspect "C: #{msg}"
-    :ok = :ssl.send(socket, msg)
+#    IO.inspect "C: #{msg}"
+    Socket.send(socket, msg)
+  end
+
+  defp imap_receive(socket, req) do
+    {:ok, msg} = Socket.recv(socket, 0)
+
+    %Response{request: req} |> parse_message(msg)
+  end
+
+  defp parse_message(resp, ""), do: resp
+  defp parse_message(resp, message) do
+    tag = resp.request.tag
+    [head | [tail]] = String.split(message, "\r\n", parts: 2)
+    {:ok, resp, tail} = Response.parse(resp, head, tail)
+    if (resp.partial) do
+      parse_message(resp, tail)
+    else
+      resp
+    end
   end
 
   defp imap_receive_raw(socket) do
-    {:ok, msg} = :ssl.recv(socket, 0)
-    msgs = String.split(msg, "\r\n")
+    {:ok, msg} = Socket.recv(socket, 0)
+    msgs = String.split(msg, "\r\n", parts: 2)
     msgs = Enum.drop msgs, -1
-    Enum.map(msgs, &(IO.inspect "S: #{&1}"))
+#    Enum.map(msgs, &(IO.inspect "S: #{&1}"))
     msgs
-  end
-
-  defp encode(%{tag_prefix: tag_prefix, tag_number: tag_number}, command, params) do
-    req = %Request{tag: "#{tag_prefix}#{tag_number}", command: command, params: params}
-    msg = "#{req.tag} #{req.command} #{Enum.join(req.params, " ")}\r\n"
   end
 
 end
