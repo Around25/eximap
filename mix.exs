@@ -53,7 +53,7 @@ defmodule Eximap.Mixfile do
 
   defp docs do
     [
-      main: "README", # The main page in the docs
+      main: "readme", # The main page in the docs
       extras: ["README.md", "DEVELOPER.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md"]
     ]
   end
