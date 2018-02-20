@@ -35,7 +35,7 @@ One easy way of getting an IMAP server up and running is with Docker.
 Make sure you have Docker installed and that the following ports are open and then run this command:
 ```sh
 docker run -d -p 25:25 -p 80:80 -p 443:443 -p 110:110 -p 143:143 -p 465:465 -p 587:587 -p 993:993 -p 995:995 -v /etc/localtime:/etc/localtime:ro -t analogic/poste.io
-curl --request POST --url https://localhost/admin/install/server --form install[hostname]=127.0.0.1 --form install[superAdmin]=admin@127.0.0.1 --form install[superAdminPassword]=admin
+curl --insecure --request POST --url https://localhost/admin/install/server --form install[hostname]=127.0.0.1 --form install[superAdmin]=admin@127.0.0.1 --form install[superAdminPassword]=admin
 ```
 
 Once the container is up and running you can create a new email address.
