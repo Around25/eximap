@@ -1,5 +1,9 @@
 # Eximap
 
+[![Build Status](https://travis-ci.org/Around25/eximap.svg?branch=master)](https://travis-ci.org/Around25/eximap)
+[![Hex Version](https://img.shields.io/hexpm/v/eximap.svg)](https://hex.pm/packages/eximap)
+[![Coverage Status](https://coveralls.io/repos/github/Around25/eximap/badge.svg?branch=master)](https://coveralls.io/github/Around25/eximap?branch=master)
+
 Eximap is an elixir library that can connect to IMAP servers via TLS and execute commands.
 
 ## Motivation
@@ -30,18 +34,8 @@ One easy way of getting an IMAP server up and running is with Docker.
 
 Make sure you have Docker installed and that the following ports are open and then run this command:
 ```sh
-docker run \
-    -p 25:25 \
-    -p 80:80 \
-    -p 443:443 \
-    -p 110:110 \
-    -p 143:143 \
-    -p 465:465 \
-    -p 587:587 \
-    -p 993:993 \
-    -p 995:995 \
-    -v /etc/localtime:/etc/localtime:ro \
-    -t analogic/poste.io
+docker run -d -p 25:25 -p 80:80 -p 443:443 -p 110:110 -p 143:143 -p 465:465 -p 587:587 -p 993:993 -p 995:995 -v /etc/localtime:/etc/localtime:ro -t analogic/poste.io
+curl --request POST --url https://localhost/admin/install/server --form install[hostname]=127.0.0.1 --form install[superAdmin]=admin@127.0.0.1 --form install[superAdminPassword]=admin
 ```
 
 Once the container is up and running you can create a new email address.
