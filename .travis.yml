@@ -7,7 +7,8 @@ services:
 before_install:
   - "docker pull analogic/poste.io"
   - "docker run -d -p 25:25 -p 80:80 -p 443:443 -p 110:110 -p 143:143 -p 465:465 -p 587:587 -p 993:993 -p 995:995 -v /etc/localtime:/etc/localtime:ro -t analogic/poste.io"
-  - "sleep 15"
+  - "docker ps -a"
+  - "sleep 30"
   - "curl --insecure --request POST --url https://localhost/admin/install/server --form install[hostname]=127.0.0.1 --form install[superAdmin]=admin@127.0.0.1 --form install[superAdminPassword]=admin"
 
 elixir:
