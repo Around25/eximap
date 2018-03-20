@@ -30,7 +30,10 @@ defmodule Eximap.Imap.Request do
 
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.capability()
-    iex> Eximap.Imap.Client.execute(pid, req)
+    iex> resp = Eximap.Imap.Client.execute(pid, req)
+    iex> resp.error == nil
+    true
+
     %Eximap.Imap.Response{body: [%{},
              %{message: "IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SPECIAL-USE QUOTA",
                type: "CAPABILITY"}], error: nil,
@@ -58,18 +61,10 @@ defmodule Eximap.Imap.Request do
 
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.list()
-    iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: [%{},
-             %{message: "(\\HasNoChildren) \".\" INBOX", type: "LIST"},
-             %{message: "(\\HasNoChildren \\Sent) \".\" Sent", type: "LIST"},
-             %{message: "(\\HasNoChildren \\Trash) \".\" Trash", type: "LIST"},
-             %{message: "(\\HasNoChildren \\Drafts) \".\" Drafts",
-               type: "LIST"},
-             %{message: "(\\HasNoChildren \\Junk) \".\" Junk", type: "LIST"}],
-            error: nil, message: "List completed (0.000 + 0.000 secs).",
-            partial: false,
-            request: %Eximap.Imap.Request{command: "LIST",
-             params: ["\"\"", "\"%\""], tag: "EX1"}, status: "OK"}
+    iex> resp = Eximap.Imap.Client.execute(pid, req)
+    iex> resp.error == nil
+    true
+
   """
   def list(reference\\"\"\"", mailbox \\ "\"%\""), do: %Eximap.Imap.Request{command: "LIST", params: [reference, mailbox]}
   def lsub(reference\\"\"\"", mailbox \\ "\"\""), do: %Eximap.Imap.Request{command: "LSUB", params: [reference, mailbox]}
@@ -82,12 +77,10 @@ defmodule Eximap.Imap.Request do
 
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.logout()
-    iex> Eximap.Imap.Client.execute(pid, req)
-    %Eximap.Imap.Response{body: [%{},
-       %{message: "Logging out", type: "BYE"}], error: nil,
-      message: "Logout completed (0.000 + 0.000 secs).", partial: false,
-      request: %Eximap.Imap.Request{command: "LOGOUT", params: [],
-       tag: "EX1"}, status: "OK"}
+    iex> resp = Eximap.Imap.Client.execute(pid, req)
+    iex> resp.error == nil
+    true
+
   """
   def logout(), do: %Eximap.Imap.Request{command: "LOGOUT"}
 
@@ -95,7 +88,10 @@ defmodule Eximap.Imap.Request do
 
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.select("INBOX")
-    iex> Eximap.Imap.Client.execute(pid, req)
+    iex> resp = Eximap.Imap.Client.execute(pid, req)
+    iex> resp.error == nil
+    true
+
     %Eximap.Imap.Response{body: [%{},
              %{message: "[HIGHESTMODSEQ 1] Highest", type: "OK"},
              %{message: "[UIDNEXT 1] Predicted next UID", type: "OK"},
@@ -118,7 +114,10 @@ defmodule Eximap.Imap.Request do
 
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> req = Eximap.Imap.Request.examine("INBOX")
-    iex> Eximap.Imap.Client.execute(pid, req)
+    iex> resp = Eximap.Imap.Client.execute(pid, req)
+    iex> resp.error == nil
+    true
+
     %Eximap.Imap.Response{body: [%{},
              %{message: "[HIGHESTMODSEQ 1] Highest", type: "OK"},
              %{message: "[UIDNEXT 1] Predicted next UID", type: "OK"},
@@ -144,7 +143,10 @@ defmodule Eximap.Imap.Request do
     iex> {:ok, pid} = Eximap.Imap.Client.start_link()
     iex> Eximap.Imap.Client.execute(pid, Eximap.Imap.Request.select("INBOX"))
     iex> req = Eximap.Imap.Request.check()
-    iex> Eximap.Imap.Client.execute(pid, req)
+    iex> resp = Eximap.Imap.Client.execute(pid, req)
+    iex> resp.error == nil
+    true
+
     %Eximap.Imap.Response{body: [%{}], error: nil,
             message: "Check completed (0.001 + 0.000 secs).", partial: false,
             request: %Eximap.Imap.Request{command: "CHECK", params: [],
