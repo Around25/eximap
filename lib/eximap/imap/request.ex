@@ -151,6 +151,12 @@ defmodule Eximap.Imap.Request do
             message: "Check completed (0.001 + 0.000 secs).", partial: false,
             request: %Eximap.Imap.Request{command: "CHECK", params: [],
              tag: "EX2"}, status: "OK"}
+
+    iex> {:ok, pid} = Eximap.Imap.Client.start_link()
+    iex> Eximap.Imap.Client.execute(pid, Eximap.Imap.Request.select("INBOX"))
+    iex> resp = Eximap.Imap.Client.execute(pid, Eximap.Imap.Request.search(["ALL"]))
+    iex> resp.error == nil
+    true
   """
   def check(), do: %Eximap.Imap.Request{command: "CHECK", params: []}
   def starttls(), do: %Eximap.Imap.Request{command: "STARTTLS", params: []}
