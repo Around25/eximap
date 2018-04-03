@@ -25,7 +25,12 @@ defmodule Eximap.Imap.Response do
   end
 
   defp parse_message("untagged", resp, msg, rest) do
-    [type | [msg]] = String.split(msg, " ", parts: 2)
+    # handle one term msg, eg Request.search(["ALL"]) on an empty mailbox returns "* SEARCH\r\n"
+    {type, msg} =
+      case String.split(msg, " ", parts: 2) do
+        [type | [msg]] -> {type, msg}
+        [type] -> {type, nil}
+      end
     {:ok, append_to_response(resp, item: %{type: type, message: msg}), rest}
   end
 

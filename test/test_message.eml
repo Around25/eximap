@@ -1,0 +1,25 @@
+Return-Path: <test@localhost>
+Delivered-To: test@localhost
+Received: from localhost (localhost [127.0.0.1])
+	by localhost (Postfix) with ESMTP id 56005FB70B
+	for <test@localhost>; Tue, 27 Mar 2018 12:16:41 +1100 (AEDT)
+Received: from localhost ([127.0.0.1])
+	by localhost (h1.localhost [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id qoRT7-k7iw8b for <test@localhost>;
+	Tue, 27 Mar 2018 12:16:41 +1100 (AEDT)
+Received: from 192-168-1-105.xxx.com (unknown [61.61.61.61])
+	(Authenticated sender: test@localhost)
+	by localhost (Postfix) with ESMTPSA id 8F307FB70A
+	for <test@localhost>; Tue, 27 Mar 2018 12:16:40 +1100 (AEDT)
+From: Test <test@localhost>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Test
+Message-Id: <85F9BC94-2968-452F-9C17-B7C3E5EDA219@localhost>
+Date: Tue, 27 Mar 2018 12:16:33 +1100
+To: Test <test@localhost>
+X-Mailer: Apple Mail (2.3445.5.20)
+
+Test

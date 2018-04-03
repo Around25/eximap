@@ -9,6 +9,7 @@ defmodule Eximap.Imap.Client do
   """
 
   @initial_state %{socket: nil, tag_number: 1}
+  @literal ~r/{([0-9]*)}\r\n/s
 
   def start_link do
     GenServer.start_link(__MODULE__, @initial_state)
@@ -59,24 +60,52 @@ defmodule Eximap.Imap.Client do
   end
 
   defp imap_send_raw(socket, msg) do
-#    IO.inspect "C: #{msg}"
+   # IO.inspect "C: #{msg}"
     Socket.send(socket, msg)
   end
 
   defp imap_receive(socket, req) do
-    {:ok, msg} = Socket.recv(socket, 0)
-
+    msg = assemble_msg(socket, req.tag)
+    # IO.inspect("R: #{msg}")
     %Response{request: req} |> parse_message(msg)
   end
 
+  # assemble a complete message
+  defp assemble_msg(socket, tag), do: assemble_msg(socket, tag, "")
+
+  defp assemble_msg(socket, tag, msg) do
+    {:ok, recv} = Socket.recv(socket, 0)
+    msg = msg <> recv
+    if Regex.match?(~r/^.*#{tag} .*\r\n$/s, msg),
+      do: msg,
+      else: assemble_msg(socket, tag, msg)
+  end
+
   defp parse_message(resp, ""), do: resp
-  defp parse_message(resp, message) do
-    [head | [tail]] = String.split(message, "\r\n", parts: 2)
-    {:ok, resp, tail} = Response.parse(resp, head, tail)
-    if (resp.partial) do
-      parse_message(resp, tail)
+  defp parse_message(resp, msg) do
+    [part, other_parts] = get_msg_part(msg)
+    {:ok, resp, other_parts} = Response.parse(resp, part, other_parts)
+    if resp.partial, do: parse_message(resp, other_parts), else: resp
+  end
+
+  # get [message part, other message parts] that recognises {size}\r\n literals
+  defp get_msg_part(msg), do: get_msg_part("", msg)
+  defp get_msg_part(part, other_parts) do
+    if other_parts =~ @literal do
+      [_match | [size]] = Regex.run(@literal, other_parts)
+      size = String.to_integer(size)
+      [head, tail] = String.split(other_parts, @literal, parts: 2)
+      literal = for i <- 0..(size - 1), do: Enum.at(String.codepoints(tail), i)
+      literal = to_string(literal)
+      {_, post_literal} = String.split_at(tail, String.length(literal))
+
+      case post_literal do
+        "\r\n" <> next -> [part <> head <> literal, next]
+        _ -> get_msg_part(part <> head <> literal, post_literal)
+      end
     else
-      resp
+      [h, t] = String.split(other_parts, "\r\n", parts: 2)
+      [part <> h, t]
     end
   end
 

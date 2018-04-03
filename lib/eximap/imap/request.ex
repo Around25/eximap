@@ -135,7 +135,7 @@ defmodule Eximap.Imap.Request do
   def create(name), do: %Eximap.Imap.Request{command: "CREATE", params: [name]}
   def delete(name), do: %Eximap.Imap.Request{command: "DELETE", params: [name]}
   def status(name, opts), do: %Eximap.Imap.Request{command: "STATUS", params: [name, opts]}
-  def append(name, [] = opts), do: %Eximap.Imap.Request{command: "APPEND", params: [name, Enum.join(opts, "")]}
+  def append(name, opts), do: %Eximap.Imap.Request{command: "APPEND", params: [name, Enum.join(opts, "")]}
   def rename(name, new_name), do: %Eximap.Imap.Request{command: "RENAME", params: [name, new_name]}
 
   @doc ~S"""
@@ -151,6 +151,12 @@ defmodule Eximap.Imap.Request do
             message: "Check completed (0.001 + 0.000 secs).", partial: false,
             request: %Eximap.Imap.Request{command: "CHECK", params: [],
              tag: "EX2"}, status: "OK"}
+
+    iex> {:ok, pid} = Eximap.Imap.Client.start_link()
+    iex> Eximap.Imap.Client.execute(pid, Eximap.Imap.Request.select("INBOX"))
+    iex> resp = Eximap.Imap.Client.execute(pid, Eximap.Imap.Request.search(["ALL"]))
+    iex> resp.error == nil
+    true
   """
   def check(), do: %Eximap.Imap.Request{command: "CHECK", params: []}
   def starttls(), do: %Eximap.Imap.Request{command: "STARTTLS", params: []}
