@@ -23,7 +23,7 @@ use Mix.Config
 
 config :eximap,
   account: "admin@localhost.dev",
-  password: "secret",
+  password: "admin",
   use_ssl: true,
   incoming_mail_server: "localhost.dev",
   incoming_port: 993, #TLS
