@@ -78,18 +78,15 @@ iex> Eximap.Imap.Client.execute(pid, req) |> Map.from_struct()
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+Eximap in [available in Hex](https://hex.pm/docs/publish) and can be installed
 by adding `eximap` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:eximap, "~> 0.1.0"}
+    {:eximap, "~> 0.1.1-dev"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/eximap](https://hexdocs.pm/eximap).
-
+The documentation is available here: https://hexdocs.pm/eximap/readme.html
