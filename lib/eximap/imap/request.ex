@@ -14,7 +14,7 @@ defmodule Eximap.Imap.Request do
     iex> req = Eximap.Imap.Request.noop()
     iex> Eximap.Imap.Client.execute(pid, req) |> Map.from_struct()
     %{body: [%{}], error: nil,
-             message: "NOOP completed (0.000 + 0.000 secs).", partial: false,
+             message: "NOOP completed (0.001 + 0.000 secs).", partial: false,
              request: %Eximap.Imap.Request{command: "NOOP", params: [],
               tag: "EX1"}, status: "OK"}
 
