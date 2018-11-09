@@ -5,7 +5,21 @@ defmodule Eximap.Imap.Request do
   defstruct tag: "TAG", command: nil, params: []
 
   def add_tag(req, tag), do: %Eximap.Imap.Request{req | tag: tag}
-  def raw(req), do: "#{req.tag} #{req.command} #{Enum.join(req.params, " ")}\r\n"
+
+  def raw(req) do
+    params =
+      case req.params do
+        [] -> nil
+        _ -> Enum.join(req.params, " ")
+      end
+     s =
+      [req.tag, req.command, params]
+      |> Enum.filter(& &1)
+      |> Enum.map(&to_string(&1))
+      |> Enum.join(" ")
+     s <> "\r\n"
+  end
+
 
   @doc ~S"""
   The NOOP command always succeeds.  It does nothing.
