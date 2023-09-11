@@ -16,7 +16,7 @@ defmodule Eximap.Imap.Client do
   end
 
   def init(state) do
-    opts = [:binary, active: false]
+    opts = [:binary, active: false, verify: :verify_peer, cacerts: :certifi.cacerts()]
     host = Application.get_env(:eximap, :incoming_mail_server) |> to_charlist
     port = Application.get_env(:eximap, :incoming_port)
     account = Application.get_env(:eximap, :account)
